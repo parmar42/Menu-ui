@@ -37,113 +37,63 @@
     // ----------------------------------------------------
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwE1yWQyEQRPTZKy5fNv0x4CEMowKynZxk_i0iTNmpGZQv37BaYZVHwMQUAOMJ77WMe/exec'; 
 
-// 1. Helper function to read the Conversation ID from the URL
-function getConversationIdFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    // The link from Botpress used 'convoId'
-    return urlParams.get('convoId'); 
-}
+    const form = document.getElementById('postTestForm');
+    const messageDiv = document.getElementById('message');
+    const submitBtn = document.getElementById('submitBtn');
 
-// 2. Main submission function
-// Example of your form submission handler function
-async function sendOrder(event) {
-    // 🚨 IMPORTANT: If this function is NOT called directly by the form's 
-    // submit event, you may not need this line, but for a standard form it is needed.
-    event.preventDefault(); 
-
-    // 1. Data Collection (Ensure these IDs match your HTML form inputs)
-    const nameValue = document.getElementById('customerNameInput').value;
-    const phoneValue = document.getElementById('customerPhoneInput').value;
-    const summaryValue = document.getElementById('orderSummaryInput').value;
-    
-    // 2. Critical ID Retrieval
-    const conversationIdValue = getConversationIdFromURL(); // Function we defined earlier
-
-    if (!conversationIdValue) {
-        alert("Error: Missing Conversation ID. Please start the order from WhatsApp.");
-        return; // Stops the function if the ID is missing
+    // Utility function to display messages
+    function showMessage(text, type) {
+        messageDiv.textContent = text;
+        messageDiv.className = type;
+        messageDiv.style.display = 'block';
     }
-    
-    // 3. Build the Payload
-    const payloadToSendToAppsScript = {
-        customerName: nameValue,
-        customerPhone: phoneValue,
-        orderSummary: summaryValue,
-        conversationId: conversationIdValue 
-    };
 
-    // 4. Send the Request to Apps Script
-    const appsScriptUrl = ''https://script.google.com/macros/s/AKfycbwE1yWQyEQRPTZKy5fNv0x4CEMowKynZxk_i0iTNmpGZQv37BaYZVHwMQUAOMJ77WMe/exec'; // <-- MUST BE CORRECT URL!
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending...';
+        messageDiv.style.display = 'none';
 
-    try {
-        const response = await fetch(appsScriptUrl, {
-            method: 'POST',
-            // CRITICAL: This content-type makes Apps Script populate e.parameter
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            // CRITICAL: Encodes the payload object into the required string format
-            body: new URLSearchParams(payloadToSendToAppsScript)
-        });
+        // 1. Collect form data
+        const formData = new FormData(form);
+        // 2. Convert to URLSearchParams object (required format for Apps Script POST body)
+        const urlEncodedData = new URLSearchParams(formData);
 
-        // 5. Handle Response
-        if (response.ok) {
-            const result = await response.json();
-            if (result.result === 'success') {
-                alert("Order submitted successfully!");
-            } else {
-                alert("Submission failed on server: " + (result.message || 'Unknown error'));
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST', // CRITICAL: Use POST
+                // CORS headers are usually managed by the browser, but this content type is critical
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: urlEncodedData // Data sent in the request body
+            });
+            
+            // Check for successful HTTP status (200 OK)
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        } else {
-             alert(`Server Error: Status ${response.status}. Check Apps Script logs.`);
+
+            const result = await response.json();
+            
+            if (result.result === 'success') {
+                showMessage(`✅ Success! ${result.message} Name: ${result.nameReceived}`, 'success');
+                form.reset();
+            } else {
+                showMessage(`❌ Script Error: ${result.message}`, 'error');
+            }
+
+        } catch (error) {
+            console.error('Fetch Error:', error);
+            showMessage(`🚨 Fatal Error: Could not connect to Google Apps Script. Check URL and Network.`, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Data';
         }
-    } catch (error) {
-        console.error('Fetch Error:', error);
-        alert('A network error occurred.');
-    }
-}
-    
-    // Build the payload (must be in the format Apps Script expects)
-    const payloadToSendToAppsScript = {
-        customerName: nameValue,
-        customerPhone: phoneValue,
-        orderSummary: summaryValue,
-        conversationId: conversationIdValue // CRITICAL FIELD
-    };
-
-    try {
-        const response = await fetch(APPS_SCRIPT_URL, {
-            method: 'POST',
-            // Apps Script doPost expects application/x-www-form-urlencoded format
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            // Convert the object into the format Apps Script can read (e.parameter)
-            body: new URLSearchParams(payloadToSendToAppsScript)
-        });
-
-        const result = await response.json();
-
-        if (result.result === 'success') {
-            alert("Order placed successfully! Check your WhatsApp for confirmation.");
-            // You may want to redirect the user or clear the form here
-        } else {
-            alert("Order failed to submit. Error: " + result.message);
-        }
-
-    } catch (error) {
-        console.error('Network or submission error:', error);
-        alert('An unexpected error occurred during submission.');
-    }
-}
-
-// Attach the function to your form submit event (e.g., using document.getElementById('yourFormId').addEventListener('submit', sendOrder);)
+    });
 </script>
 
 </body>
-
 </html>
-
-
-
-
