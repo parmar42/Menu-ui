@@ -45,20 +45,63 @@ function getConversationIdFromURL() {
 }
 
 // 2. Main submission function
+// Example of your form submission handler function
 async function sendOrder(event) {
-    event.preventDefault(); // Stop the form from traditional submission
+    // 🚨 IMPORTANT: If this function is NOT called directly by the form's 
+    // submit event, you may not need this line, but for a standard form it is needed.
+    event.preventDefault(); 
 
-    // Get values from form inputs (adjust IDs to match your HTML)
+    // 1. Data Collection (Ensure these IDs match your HTML form inputs)
     const nameValue = document.getElementById('customerNameInput').value;
     const phoneValue = document.getElementById('customerPhoneInput').value;
     const summaryValue = document.getElementById('orderSummaryInput').value;
-
-    const conversationIdValue = getConversationIdFromURL();
     
+    // 2. Critical ID Retrieval
+    const conversationIdValue = getConversationIdFromURL(); // Function we defined earlier
+
     if (!conversationIdValue) {
-        alert("Error: Conversation ID is missing. Please start the order from WhatsApp.");
-        return;
+        alert("Error: Missing Conversation ID. Please start the order from WhatsApp.");
+        return; // Stops the function if the ID is missing
     }
+    
+    // 3. Build the Payload
+    const payloadToSendToAppsScript = {
+        customerName: nameValue,
+        customerPhone: phoneValue,
+        orderSummary: summaryValue,
+        conversationId: conversationIdValue 
+    };
+
+    // 4. Send the Request to Apps Script
+    const appsScriptUrl = 'YOUR_DEPLOYED_APPS_SCRIPT_URL'; // <-- MUST BE CORRECT URL!
+
+    try {
+        const response = await fetch(appsScriptUrl, {
+            method: 'POST',
+            // CRITICAL: This content-type makes Apps Script populate e.parameter
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            // CRITICAL: Encodes the payload object into the required string format
+            body: new URLSearchParams(payloadToSendToAppsScript)
+        });
+
+        // 5. Handle Response
+        if (response.ok) {
+            const result = await response.json();
+            if (result.result === 'success') {
+                alert("Order submitted successfully!");
+            } else {
+                alert("Submission failed on server: " + (result.message || 'Unknown error'));
+            }
+        } else {
+             alert(`Server Error: Status ${response.status}. Check Apps Script logs.`);
+        }
+    } catch (error) {
+        console.error('Fetch Error:', error);
+        alert('A network error occurred.');
+    }
+}
     
     // Build the payload (must be in the format Apps Script expects)
     const payloadToSendToAppsScript = {
@@ -100,5 +143,6 @@ async function sendOrder(event) {
 </body>
 
 </html>
+
 
 
