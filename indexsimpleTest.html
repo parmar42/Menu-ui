@@ -1,108 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POST Test Form</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
-        .container { max-width: 400px; margin: 0 auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
-        input[type="text"] { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; }
-        #message { margin-top: 20px; padding: 10px; border-radius: 4px; display: none; }
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    </style>
+  <meta charset="UTF-8">
+  <title>Restaurant ROI Calculator</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    label { display: block; margin-top: 1rem; }
+    input { padding: 0.5rem; width: 200px; }
+    button { margin-top: 1rem; padding: 0.5rem 1rem; }
+    .result { margin-top: 2rem; padding: 1rem; border: 1px solid #ccc; }
+    canvas { margin-top: 2rem; }
+  </style>
 </head>
 <body>
+  <h1>WhatsApp + KDS ROI Calculator</h1>
 
-<div class="container">
-    <h2>Apps Script POST Test</h2>
-    <div id="message"></div>
+  <label>Orders per day: <input type="number" id="orders" value="75"></label>
+  <label>Telephone time per order (min): <input type="number" id="telTime" value="3"></label>
+  <label>Raw WhatsApp time per order (min): <input type="number" id="waTime" value="2"></label>
+  <label>Automated WhatsApp+KDS time per order (min): <input type="number" id="kdsTime" value="0.75"></label>
+  <label>Staff hourly wage ($): <input type="number" id="wage" value="10"></label>
+  <label>System monthly cost ($): <input type="number" id="cost" value="150"></label>
+  <label>Adoption rate (% using WhatsApp): <input type="number" id="adoption" value="50"></label>
 
-    <form id="postTestForm">
-        <!-- Hidden field to capture the phone number -->
-      <input type="hidden" name="phone" id="phone">
-        <label for="customerName">Name:</label>
-        <input type="text" id="customerName" name="customerName" required>
+  <button onclick="calculateROI()">Calculate ROI</button>
 
-        <label for="phoneNumber">Phone Number:</label>
-        <input type="text" id="phoneNumber" name="phoneNumber" required>
+  <div class="result" id="result"></div>
 
-        <button type="submit" id="submitBtn">Submit Data</button>
-    </form>
-</div>
+  <canvas id="timeChart" width="400" height="200"></canvas>
 
-<script>
-    // ----------------------------------------------------
-    // *** IMPORTANT: REPLACE THIS WITH YOUR DEPLOYED URL ***
-    // ----------------------------------------------------
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwE1yWQyEQRPTZKy5fNv0x4CEMowKynZxk_i0iTNmpGZQv37BaYZVHwMQUAOMJ77WMe/exec'; 
-    const form = document.getElementById('postTestForm');
-    const messageDiv = document.getElementById('message');
-    const submitBtn = document.getElementById('submitBtn');
+  <script>
+    let chart;
 
-    const params = new URLSearchParams(window.location.search)
-                const phone = params.get('phone')
+    function calculateROI() {
+      const orders = parseFloat(document.getElementById('orders').value);
+      const telTime = parseFloat(document.getElementById('telTime').value);
+      const waTime = parseFloat(document.getElementById('waTime').value);
+      const kdsTime = parseFloat(document.getElementById('kdsTime').value);
+      const wage = parseFloat(document.getElementById('wage').value);
+      const cost = parseFloat(document.getElementById('cost').value);
+      const adoption = parseFloat(document.getElementById('adoption').value) / 100;
 
-                if (phone) {
-                  document.getElementById('phone').value = phone
-   }
+      const waOrders = orders * adoption;
 
+      const telSavingsPerOrder = telTime - kdsTime;
+      const waSavingsPerOrder = waTime - kdsTime;
 
-    // Utility function to display messages
-    function showMessage(text, type) {
-        messageDiv.textContent = text;
-        messageDiv.className = type;
-        messageDiv.style.display = 'block';
-    }
+      const dailyTelSavings = waOrders * telSavingsPerOrder;
+      const dailyWaSavings = waOrders * waSavingsPerOrder;
 
-    form.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        // Show loading state
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Sending...';
-        messageDiv.style.display = 'none';
+      const dailyHoursSavedTel = dailyTelSavings / 60;
+      const dailyHoursSavedWa = dailyWaSavings / 60;
 
-        // 1. Collect form data
-        const formData = new FormData(form);
-        // 2. Convert to URLSearchParams object (required format for Apps Script POST body)
-        const urlEncodedData = new URLSearchParams(formData);
+      const monthlySavingsTel = dailyHoursSavedTel * wage * 30;
+      const monthlySavingsWa = dailyHoursSavedWa * wage * 30;
 
-        try {
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST', // CRITICAL: Use POST
-                // CORS headers are usually managed by the browser, but this content type is critical
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: urlEncodedData // Data sent in the request body
-            });
-            
-            // Check for successful HTTP status (200 OK)
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+      const netGain = monthlySavingsTel - cost;
+      const roiPercent = (netGain / cost) * 100;
 
-           const result = await response.json();
-            
-            if (result.result === 'success') {
-                showMessage(`✅ Success! ${result.message} Name: ${result.nameReceived}`, 'success');
-                form.reset();
-            } else {
-                showMessage(`❌ Script Error: ${result.message}`, 'error');
-            }
+      document.getElementById('result').innerHTML = `
+        <h2>Results</h2>
+        <p>Daily hours saved vs Telephone: ${dailyHoursSavedTel.toFixed(2)} hrs</p>
+        <p>Daily hours saved vs Raw WhatsApp: ${dailyHoursSavedWa.toFixed(2)} hrs</p>
+        <p>Monthly savings vs Telephone: $${monthlySavingsTel.toFixed(2)}</p>
+        <p>Monthly savings vs Raw WhatsApp: $${monthlySavingsWa.toFixed(2)}</p>
+        <p>Net gain after system cost: $${netGain.toFixed(2)}</p>
+        <p>ROI: ${roiPercent.toFixed(0)}%</p>
+      `;
 
-        } catch (error) {
-            console.error('Fetch Error:', error);
-            showMessage(`🚨 Fatal Error: Could not connect to Google Apps Script. Check URL and Network.`, 'error');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit Data';
+      // Chart data
+      const times = [
+        (orders * telTime) / 60,
+        (orders * waTime) / 60,
+        (orders * kdsTime) / 60
+      ];
+
+      const labels = ["Telephone Orders", "Raw WhatsApp", "WhatsApp + KDS"];
+
+      if (chart) chart.destroy();
+      chart = new Chart(document.getElementById('timeChart'), {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Total Hours per Day',
+            data: times,
+            backgroundColor: ['#f87171','#fbbf24','#34d399']
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true, title: { display: true, text: 'Hours per Day' } }
+          }
         }
-    });
-</script>
-
+      });
+    }
+  </script>
 </body>
 </html>
