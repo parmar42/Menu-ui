@@ -80,6 +80,7 @@
     <label>Automated WhatsApp+KDS time per order (min): <input type="number" id="kdsTime" value="0.75"></label>
     <label>Staff hourly wage ($): <input type="number" id="wage" value="10"></label>
     <label>System monthly cost ($): <input type="number" id="cost" value="150"></label>
+    <label>Manual adoption rate (% using WhatsApp): <input type="number" id="adoption" value="50"></label>
 
     <button onclick="calculateROI()">Calculate ROI</button>
 
@@ -95,6 +96,7 @@
       const kdsTime = parseFloat(document.getElementById('kdsTime').value);
       const wage = parseFloat(document.getElementById('wage').value);
       const cost = parseFloat(document.getElementById('cost').value);
+      const adoptionManual = parseFloat(document.getElementById('adoption').value) / 100;
 
       // Adoption scenarios
       const adoptionRates = [0.25, 0.5, 0.75, 1.0];
@@ -108,13 +110,22 @@
         return { rate, monthlySavings, netGain };
       });
 
-      // Show results for 100% adoption
-      const full = savings[savings.length-1];
+      // Manual adoption calculation
+      const waOrdersManual = orders * adoptionManual;
+      const telSavingsPerOrder = telTime - kdsTime;
+      const dailyTelSavingsManual = waOrdersManual * telSavingsPerOrder;
+      const dailyHoursSavedManual = dailyTelSavingsManual / 60;
+      const monthlySavingsManual = dailyHoursSavedManual * wage * 30;
+      const netGainManual = monthlySavingsManual - cost;
+      const roiManual = (netGainManual / cost) * 100;
+
       document.getElementById('result').innerHTML = `
-        <h2>Results (100% Adoption)</h2>
-        <p><strong>Monthly savings vs Telephone:</strong> $${full.monthlySavings.toFixed(2)}</p>
-        <p><strong>Net gain after system cost:</strong> $${full.netGain.toFixed(2)}</p>
-        <p><strong>ROI:</strong> ${((full.netGain/cost)*100).toFixed(0)}%</p>
+        <h2>Results (Manual Adoption)</h2>
+        <p><strong>Adoption Rate:</strong> ${(adoptionManual*100).toFixed(0)}%</p>
+        <p><strong>Daily hours saved vs Telephone:</strong> ${dailyHoursSavedManual.toFixed(2)} hrs</p>
+        <p><strong>Monthly savings vs Telephone:</strong> $${monthlySavingsManual.toFixed(2)}</p>
+        <p><strong>Net gain after system cost:</strong> $${netGainManual.toFixed(2)}</p>
+        <p><strong>ROI:</strong> ${roiManual.toFixed(0)}%</p>
       `;
 
       // Chart
