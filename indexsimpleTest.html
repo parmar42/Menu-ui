@@ -5,94 +5,145 @@
   <title>Restaurant ROI Calculator</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 2rem; }
-    label { display: block; margin-top: 1rem; }
-    input { padding: 0.5rem; width: 200px; }
-    button { margin-top: 1rem; padding: 0.5rem 1rem; }
-    .result { margin-top: 2rem; padding: 1rem; border: 1px solid #ccc; }
-    canvas { margin-top: 2rem; }
+    :root {
+      --primary: #4f46e5;
+      --secondary: #06b6d4;
+      --accent: #f59e0b;
+      --bg: #f9fafb;
+      --text: #1f2937;
+    }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background: var(--bg);
+      color: var(--text);
+    }
+    h1 {
+      text-align: center;
+      color: var(--primary);
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: 600;
+    }
+    input {
+      padding: 0.6rem;
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-top: 0.3rem;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 1.5rem;
+      padding: 0.8rem;
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: var(--secondary);
+    }
+    .result {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: var(--secondary);
+      color: white;
+      border-radius: 8px;
+    }
+    canvas {
+      margin-top: 2rem;
+    }
   </style>
 </head>
 <body>
   <h1>WhatsApp + KDS ROI Calculator</h1>
+  <div class="container">
+    <label>Orders per day: <input type="number" id="orders" value="75"></label>
+    <label>Telephone time per order (min): <input type="number" id="telTime" value="3"></label>
+    <label>Automated WhatsApp+KDS time per order (min): <input type="number" id="kdsTime" value="0.75"></label>
+    <label>Staff hourly wage ($): <input type="number" id="wage" value="10"></label>
+    <label>System monthly cost ($): <input type="number" id="cost" value="150"></label>
 
-  <label>Orders per day: <input type="number" id="orders" value="75"></label>
-  <label>Telephone time per order (min): <input type="number" id="telTime" value="3"></label>
-  <label>Raw WhatsApp time per order (min): <input type="number" id="waTime" value="2"></label>
-  <label>Automated WhatsApp+KDS time per order (min): <input type="number" id="kdsTime" value="0.75"></label>
-  <label>Staff hourly wage ($): <input type="number" id="wage" value="10"></label>
-  <label>System monthly cost ($): <input type="number" id="cost" value="150"></label>
-  <label>Adoption rate (% using WhatsApp): <input type="number" id="adoption" value="50"></label>
+    <button onclick="calculateROI()">Calculate ROI</button>
 
-  <button onclick="calculateROI()">Calculate ROI</button>
-
-  <div class="result" id="result"></div>
-
-  <canvas id="timeChart" width="400" height="200"></canvas>
+    <div class="result" id="result"></div>
+    <canvas id="scenarioChart"></canvas>
+  </div>
 
   <script>
     let chart;
-
     function calculateROI() {
       const orders = parseFloat(document.getElementById('orders').value);
       const telTime = parseFloat(document.getElementById('telTime').value);
-      const waTime = parseFloat(document.getElementById('waTime').value);
       const kdsTime = parseFloat(document.getElementById('kdsTime').value);
       const wage = parseFloat(document.getElementById('wage').value);
       const cost = parseFloat(document.getElementById('cost').value);
-      const adoption = parseFloat(document.getElementById('adoption').value) / 100;
 
-      const waOrders = orders * adoption;
+      // Adoption scenarios
+      const adoptionRates = [0.25, 0.5, 0.75, 1.0];
+      const savings = adoptionRates.map(rate => {
+        const waOrders = orders * rate;
+        const telSavingsPerOrder = telTime - kdsTime;
+        const dailyTelSavings = waOrders * telSavingsPerOrder;
+        const dailyHoursSaved = dailyTelSavings / 60;
+        const monthlySavings = dailyHoursSaved * wage * 30;
+        const netGain = monthlySavings - cost;
+        return { rate, monthlySavings, netGain };
+      });
 
-      const telSavingsPerOrder = telTime - kdsTime;
-      const waSavingsPerOrder = waTime - kdsTime;
-
-      const dailyTelSavings = waOrders * telSavingsPerOrder;
-      const dailyWaSavings = waOrders * waSavingsPerOrder;
-
-      const dailyHoursSavedTel = dailyTelSavings / 60;
-      const dailyHoursSavedWa = dailyWaSavings / 60;
-
-      const monthlySavingsTel = dailyHoursSavedTel * wage * 30;
-      const monthlySavingsWa = dailyHoursSavedWa * wage * 30;
-
-      const netGain = monthlySavingsTel - cost;
-      const roiPercent = (netGain / cost) * 100;
-
+      // Show results for 100% adoption
+      const full = savings[savings.length-1];
       document.getElementById('result').innerHTML = `
-        <h2>Results</h2>
-        <p>Daily hours saved vs Telephone: ${dailyHoursSavedTel.toFixed(2)} hrs</p>
-        <p>Daily hours saved vs Raw WhatsApp: ${dailyHoursSavedWa.toFixed(2)} hrs</p>
-        <p>Monthly savings vs Telephone: $${monthlySavingsTel.toFixed(2)}</p>
-        <p>Monthly savings vs Raw WhatsApp: $${monthlySavingsWa.toFixed(2)}</p>
-        <p>Net gain after system cost: $${netGain.toFixed(2)}</p>
-        <p>ROI: ${roiPercent.toFixed(0)}%</p>
+        <h2>Results (100% Adoption)</h2>
+        <p><strong>Monthly savings vs Telephone:</strong> $${full.monthlySavings.toFixed(2)}</p>
+        <p><strong>Net gain after system cost:</strong> $${full.netGain.toFixed(2)}</p>
+        <p><strong>ROI:</strong> ${((full.netGain/cost)*100).toFixed(0)}%</p>
       `;
 
-      // Chart data
-      const times = [
-        (orders * telTime) / 60,
-        (orders * waTime) / 60,
-        (orders * kdsTime) / 60
-      ];
-
-      const labels = ["Telephone Orders", "Raw WhatsApp", "WhatsApp + KDS"];
+      // Chart
+      const labels = adoptionRates.map(r => `${r*100}% Adoption`);
+      const monthly = savings.map(s => s.monthlySavings.toFixed(2));
+      const net = savings.map(s => s.netGain.toFixed(2));
 
       if (chart) chart.destroy();
-      chart = new Chart(document.getElementById('timeChart'), {
+      chart = new Chart(document.getElementById('scenarioChart'), {
         type: 'bar',
         data: {
           labels: labels,
-          datasets: [{
-            label: 'Total Hours per Day',
-            data: times,
-            backgroundColor: ['#f87171','#fbbf24','#34d399']
-          }]
+          datasets: [
+            {
+              label: 'Monthly Savings ($)',
+              data: monthly,
+              backgroundColor: '#10b981'
+            },
+            {
+              label: 'Net Gain ($)',
+              data: net,
+              backgroundColor: '#f59e0b'
+            }
+          ]
         },
         options: {
           responsive: true,
           scales: {
-            y: { beginAtZero: true, title: { display: true, text: 'Hours per Day' } }
+            y: { beginAtZero: true, title: { display: true, text: 'USD per Month' } }
           }
         }
       });
