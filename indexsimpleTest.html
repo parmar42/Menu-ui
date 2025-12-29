@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Restaurant ROI Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- key for mobile scaling -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -15,21 +16,27 @@
     body {
       font-family: 'Segoe UI', Arial, sans-serif;
       margin: 0;
-      padding: 1rem;
+      padding: 0;
       background: var(--bg);
       color: var(--text);
     }
     h1 {
       text-align: center;
       color: var(--primary);
+      padding: 1rem;
     }
     .container {
-      max-width: 700px;
-      margin: auto;
+      width: 100%;
+      max-width: 100%;
+      margin: 0;
+      padding: 1rem;
       background: white;
-      padding: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-radius: 0;
+      box-shadow: none;
+      min-height: 100vh; /* fill screen height */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
     label {
       display: block;
@@ -37,7 +44,7 @@
       font-weight: 600;
     }
     input {
-      padding: 0.6rem;
+      padding: 0.8rem;
       width: 100%;
       border: 1px solid #ddd;
       border-radius: 8px;
@@ -46,13 +53,13 @@
     }
     button {
       margin-top: 1.5rem;
-      padding: 0.8rem;
+      padding: 1rem;
       width: 100%;
       background: var(--primary);
       color: white;
       border: none;
       border-radius: 8px;
-      font-size: 1rem;
+      font-size: 1.1rem;
       font-weight: bold;
       cursor: pointer;
       transition: background 0.3s;
@@ -66,9 +73,12 @@
       background: var(--secondary);
       color: white;
       border-radius: 8px;
+      font-size: 1rem;
     }
     canvas {
       margin-top: 2rem;
+      width: 100% !important;
+      height: auto !important;
     }
   </style>
 </head>
@@ -107,7 +117,8 @@
         const dailyHoursSaved = dailyTelSavings / 60;
         const monthlySavings = dailyHoursSaved * wage * 30;
         const netGain = monthlySavings - cost;
-        return { rate, monthlySavings, netGain };
+        const breakEvenDays = cost / (dailyHoursSaved * wage);
+        return { rate, monthlySavings, netGain, breakEvenDays };
       });
 
       // Manual adoption calculation
@@ -118,6 +129,7 @@
       const monthlySavingsManual = dailyHoursSavedManual * wage * 30;
       const netGainManual = monthlySavingsManual - cost;
       const roiManual = (netGainManual / cost) * 100;
+      const breakEvenManual = cost / (dailyHoursSavedManual * wage);
 
       document.getElementById('result').innerHTML = `
         <h2>Results (Manual Adoption)</h2>
@@ -126,6 +138,7 @@
         <p><strong>Monthly savings vs Telephone:</strong> $${monthlySavingsManual.toFixed(2)}</p>
         <p><strong>Net gain after system cost:</strong> $${netGainManual.toFixed(2)}</p>
         <p><strong>ROI:</strong> ${roiManual.toFixed(0)}%</p>
+        <p><strong>Break-even point:</strong> ${breakEvenManual.toFixed(1)} days</p>
       `;
 
       // Chart
@@ -153,6 +166,7 @@
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           scales: {
             y: { beginAtZero: true, title: { display: true, text: 'USD per Month' } }
           }
