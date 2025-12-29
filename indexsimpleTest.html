@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Restaurant ROI Calculator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- key for mobile scaling -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -27,16 +27,12 @@
     }
     .container {
       width: 100%;
-      max-width: 100%;
       margin: 0;
       padding: 1rem;
       background: white;
-      border-radius: 0;
-      box-shadow: none;
-      min-height: 100vh; /* fill screen height */
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
     }
     label {
       display: block;
@@ -75,10 +71,10 @@
       border-radius: 8px;
       font-size: 1rem;
     }
-    canvas {
+    #scenarioChart {
       margin-top: 2rem;
       width: 100% !important;
-      height: auto !important;
+      height: 300px !important; /* fixed height so it always shows */
     }
   </style>
 </head>
@@ -90,6 +86,7 @@
     <label>Automated WhatsApp+KDS time per order (min): <input type="number" id="kdsTime" value="0.75"></label>
     <label>Staff hourly wage ($): <input type="number" id="wage" value="10"></label>
     <label>System monthly cost ($): <input type="number" id="cost" value="150"></label>
+    <label>Initial setup cost ($): <input type="number" id="setup" value="300"></label>
     <label>Manual adoption rate (% using WhatsApp): <input type="number" id="adoption" value="50"></label>
 
     <button onclick="calculateROI()">Calculate ROI</button>
@@ -106,6 +103,7 @@
       const kdsTime = parseFloat(document.getElementById('kdsTime').value);
       const wage = parseFloat(document.getElementById('wage').value);
       const cost = parseFloat(document.getElementById('cost').value);
+      const setup = parseFloat(document.getElementById('setup').value);
       const adoptionManual = parseFloat(document.getElementById('adoption').value) / 100;
 
       // Adoption scenarios
@@ -117,7 +115,7 @@
         const dailyHoursSaved = dailyTelSavings / 60;
         const monthlySavings = dailyHoursSaved * wage * 30;
         const netGain = monthlySavings - cost;
-        const breakEvenDays = cost / (dailyHoursSaved * wage);
+        const breakEvenDays = (setup + cost) / (dailyHoursSaved * wage);
         return { rate, monthlySavings, netGain, breakEvenDays };
       });
 
@@ -128,16 +126,16 @@
       const dailyHoursSavedManual = dailyTelSavingsManual / 60;
       const monthlySavingsManual = dailyHoursSavedManual * wage * 30;
       const netGainManual = monthlySavingsManual - cost;
-      const roiManual = (netGainManual / cost) * 100;
-      const breakEvenManual = cost / (dailyHoursSavedManual * wage);
+      const roiManual = (netGainManual / (cost + setup)) * 100;
+      const breakEvenManual = (setup + cost) / (dailyHoursSavedManual * wage);
 
       document.getElementById('result').innerHTML = `
         <h2>Results (Manual Adoption)</h2>
         <p><strong>Adoption Rate:</strong> ${(adoptionManual*100).toFixed(0)}%</p>
         <p><strong>Daily hours saved vs Telephone:</strong> ${dailyHoursSavedManual.toFixed(2)} hrs</p>
         <p><strong>Monthly savings vs Telephone:</strong> $${monthlySavingsManual.toFixed(2)}</p>
-        <p><strong>Net gain after system cost:</strong> $${netGainManual.toFixed(2)}</p>
-        <p><strong>ROI:</strong> ${roiManual.toFixed(0)}%</p>
+        <p><strong>Net gain after monthly cost:</strong> $${netGainManual.toFixed(2)}</p>
+        <p><strong>ROI (including setup):</strong> ${roiManual.toFixed(0)}%</p>
         <p><strong>Break-even point:</strong> ${breakEvenManual.toFixed(1)} days</p>
       `;
 
