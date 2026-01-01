@@ -46,13 +46,21 @@
     }
     .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px 0; }
     .brand {
-      display: flex; align-items: baseline; gap: 14px;
+      display: -ms-inline-flexbox; 
+      
+      align-items: center
+    ;
            
     }
     
     .brand img { height: auto; width: 600; }
 
-    .brand .title { bottom: 30px; font-weight: 700; letter-spacing: 0.2px; 
+    .brand .title { 
+      font-weight: 700; 
+      font-size: 16px;
+      letter-spacing: 0.1px;
+      margin-left: 27px;
+      margin-top: -30px;    
     }
     .nav { display: flex; gap: 18px; }
     .nav a {
@@ -235,7 +243,7 @@
     <!-- Header -->
     <header aria-label="Site header">
       <div class="container header-inner">
-        <div class="brand" aria-label="Brand" display="column">
+        <div class="brand" aria-label="Brand">
           <img src="https://raw.githubusercontent.com/parmar42/images/main/assets/Arrilan%20logo%202.png" alt="arrilan logo">
            <div class="title">Automation & Tech Solutions</div>
         </div>
