@@ -235,6 +235,100 @@
       .nav { display: table-column; margin-top: 30px; }
       .panel { flex-direction: column; align-items: flex-start; }
     }
+
+   
+    .navbar{
+      min-height: 70px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: linear-gradient(180deg, rgba(2, 6, 23, 0.75) 0%, rgba(2, 6, 23, 0.35) 100%);
+    }
+
+    .hamburger{
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 25px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+     .hamburger span {
+      display: block;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: 0.3;     
+    }
+
+    .nav-links {
+      list-style: none;
+      margin: 0%;
+      padding: 20px;
+      background: #444;
+      position: fixed;
+      top: 0;
+      right: 100%;
+      width: 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      transition: right 0.3s ease;
+    }
+
+    .nav-links li a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .nav-links.active {
+      right: 0;
+    }
+
+    @media (max-width: 768px) {
+      .hamburger{
+        display: flex;
+      }
+
+    }
+
+
+        /* Default: desktop view */
+    .nav-links {
+      display: flex;   /* show full nav bar */
+    }
+    .hamburger {
+      display: none;   /* hide hamburger */
+
+
+
+    /* Mobile view only */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none; /* hide full nav bar */
+      }
+      .nav-links.active {
+        display: flex; /* show when toggled */
+      }
+      .hamburger {
+        display: flex; /* show hamburger */
+      }
+    }
+
+
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, -5px);
+    }
+   
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
   </style>
 </head>
 <body>
@@ -251,6 +345,22 @@
           <a href="#services">Services</a>
           <a href="#why">Why us</a>
           <a href="#contact">Contact</a>
+        </nav>
+      <nav class="navbar">
+        <div class="logo"><img src="https://raw.githubusercontent.com/parmar42/images/main/assets/Arrilan%20logo%202.png" alt="arrilan logo">
+          <div class="title">Automation & Tech Solutions</div>
+          <ul class="nav-menu">
+            <li class=""nav-item>
+              <a href="#services" class="nav-link">Services</a>
+              <a href="#why" class="nav-link">Why us</a>
+              <a href="#contact" class="nav-link">Contact</a>
+            </li>
+          </ul>
+          <div class="hamburger">
+            <div class="line"></div>
+            <div class="line"></div>
+            <div class="line"></div>
+          </div>
         </nav>
       </div>
     </header>
@@ -467,6 +577,17 @@
   <script>
     // Set current year
     document.getElementById('y').textContent = new Date().getFullYear();
+
+    // Hamburger menu toggle
+    const hamburger = document.querySelector('.hamburger');
+const navLinks = document.querySelector('.nav-links');
+
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('active');
+  navLinks.classList.toggle('active');
+});
+
+
   </script>
 </body>
 </html>
