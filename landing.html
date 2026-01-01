@@ -283,6 +283,36 @@
   }
 }
 
+/* Default logo size (desktop) */
+.logo img,
+.logo svg {
+  width: 60px;
+  height: auto;
+}
+
+/* Tablet screens */
+@media (max-width: 1024px) {
+  .logo img,
+  .logo svg {
+    width: 48px;   /* slightly smaller */
+  }
+  .brand .title {
+    font-size: 1.1rem; /* shrink title text a bit */
+  }
+}
+
+/* Mobile screens */
+@media (max-width: 640px) {
+  .logo img,
+  .logo svg {
+    width: 40px;   /* smaller logo */
+  }
+  .brand .title {
+    font-size: 1rem;   /* smaller title text */
+  }
+}
+
+
   </style>
 </head>
 <body>
