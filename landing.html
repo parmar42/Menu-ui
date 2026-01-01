@@ -46,18 +46,14 @@
     }
     .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px 0; }
     .brand {
-      display: flex; align-items: flex end; gap: 14px;
+      display: flex; align-items: baseline; gap: 14px;
+           
     }
-    .logo {
-      width: 44px; height: 44px; border-radius: 12px;
-      background:
-        radial-gradient(92% 92% at 30% 20%, rgba(59,130,246,0.90) 0%, rgba(34,211,238,0.85) 48%, rgba(139,92,246,0.90) 100%);
-      box-shadow: 0 10px 20px rgba(59,130,246,0.35), inset 0 0 24px rgba(255,255,255,0.25);
-      display: grid; place-items: center;
-      overflow: hidden; position: relative;
+    
+    .brand img { height: auto; width: 600; }
+
+    .brand .title { bottom: 30px; font-weight: 700; letter-spacing: 0.2px; 
     }
-    .logo svg { width: 26px; height: 26px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35)); }
-    .brand .title { font-weight: 700; letter-spacing: 0.2px; }
     .nav { display: flex; gap: 18px; }
     .nav a {
       padding: 10px 14px; border-radius: 10px;
@@ -65,7 +61,6 @@
     }
     .nav a:hover { background: rgba(148,163,184,0.12); color: var(--white); }
 
-    
     /* Hero */
     .hero {
       position: relative;
@@ -240,10 +235,9 @@
     <!-- Header -->
     <header aria-label="Site header">
       <div class="container header-inner">
-        <div class="brand" aria-label="Brand">
-          <img src= 'https://raw.githubusercontent.com/parmar42/images/main/assets/Arrilan%20logo%202.png' alt= 'logo'>
-          </div>
-          <div class="title">Tech & Automation Solutions</div>
+        <div class="brand" aria-label="Brand" display="column">
+          <img src="https://raw.githubusercontent.com/parmar42/images/main/assets/Arrilan%20logo%202.png" alt="arrilan logo">
+           <div class="title">Automation & Tech Solutions</div>
         </div>
         <nav class="nav" aria-label="Primary">
           <a href="#services">Services</a>
@@ -456,7 +450,7 @@
     <!-- Footer -->
     <footer aria-label="Footer">
       <div class="container foot-inner">
-        <small>© <span id="y"></span> Tech & Automation Solutions. All rights reserved.</small>
+        <small>© <span id="y"></span> Arrilan Automation & Tech Solutions. All rights reserved.</small>
         <small>Privacy • Terms • Security</small>
       </div>
     </footer>
