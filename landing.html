@@ -1,71 +1,565 @@
-.navbar {
-  min-height: 70px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: linear-gradient(180deg, rgba(2, 6, 23, 0.75) 0%, rgba(2, 6, 23, 0.35) 100%);
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tech & Automation Solutions</title>
 
-/* Hamburger */
-.hamburger {
-  display: none;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 25px;
-  height: 20px;
-  cursor: pointer;
-}
-.hamburger span {
-  display: block;
-  height: 3px;
-  background: #fff;
-  border-radius: 2px;
-  transition: 0.3s;
-}
+  <!--
+    Tech/Automation Landing Page
+    - Modern color palette: deep blue, slate, white, electric blue accents
+    - Responsive, accessible, and lightweight (HTML + CSS + inline SVG)
+  -->
 
-/* Nav links */
-.nav-links {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex; /* desktop default */
-  gap: 20px;
-}
-.nav-links li a {
-  color: #fff;
-  text-decoration: none;
-}
+  <style>
+    :root {
+      --bg-deep: #0f172a;        /* deep slate/blue */
+      --bg-dark: #111827;        /* near-black slate */
+      --text: #e5e7eb;           /* light gray text */
+      --muted: #cbd5e1;          /* muted slate */
+      --white: #ffffff;          /* white */
+      --accent: #3b82f6;         /* electric blue */
+      --accent-2: #22d3ee;       /* cyan */
+      --accent-3: #8b5cf6;       /* violet */
+      --success: #10b981;        /* green */
+      --shadow: 0 15px 30px rgba(2, 6, 23, 0.35);
+      --radius: 16px;
+      --radius-sm: 12px;
+      --maxw: 1100px;
+    }
 
-/* Mobile view */
-@media (max-width: 768px) {
-  .nav-links {
-    display: none; /* hide full nav bar */
-    flex-direction: column;
-    background: #444;
-    position: fixed;
-    top: 0;
-    right: -250px;
-    width: 250px;
-    height: 100%;
-    padding: 20px;
-    transition: right 0.3s ease;
-  }
-  .nav-links.active {
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg-deep); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+    a { color: inherit; text-decoration: none; }
+
+    /* Global container */
+    .wrap { width: 100%; overflow: hidden; }
+    .container { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+    /* Header */
+    header {
+      position: relative;
+      z-index: 10;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+      backdrop-filter: saturate(140%) blur(6px);
+      background: linear-gradient(180deg, rgba(2, 6, 23, 0.75) 0%, rgba(2, 6, 23, 0.35) 100%);
+    }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px 0; }
+    .brand {
+      display: -ms-inline-flexbox; 
+      
+      align-items: center
+    ;
+           
+    }
+    
+    .brand img { height: auto; width: 600; }
+
+    .brand .title { 
+      font-weight: 700; 
+      font-size: 16px;
+      letter-spacing: 0.1px;
+      margin-left: 27px;
+      margin-top: -30px;    
+    }
+    .nav { display: flex; gap: 18px; }
+    .nav a {
+      padding: 10px 14px; border-radius: 10px;
+      color: var(--muted);
+    }
+    .nav a:hover { background: rgba(148,163,184,0.12); color: var(--white); }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      overflow: clip;
+      background:
+        radial-gradient(1200px 600px at 85% -50%, rgba(59,130,246,0.25) 0%, rgba(59,130,246,0.06) 55%, transparent 70%),
+        radial-gradient(900px 500px at -10% 10%, rgba(34,211,238,0.20) 0%, rgba(34,211,238,0.08) 45%, transparent 65%),
+        linear-gradient(160deg, var(--bg-deep) 0%, var(--bg-dark) 65%);
+    }
+    .hero-inner { display: grid; grid-template-columns: 1.25fr 1fr; align-items: center; gap: 40px; padding: 70px 0; }
+    .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: 0.6px; margin-bottom: 12px; }
+    .headline { font-size: clamp(28px, 5vw, 48px); line-height: 1.05; font-weight: 800; margin: 0 0 14px 0; }
+    .subhead { font-size: 18px; color: var(--muted); max-width: 60ch; }
+    .cta-row { display: flex; gap: 14px; margin-top: 26px; flex-wrap: wrap; }
+    .btn {
+      padding: 14px 18px; border-radius: 12px; font-weight: 600; transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+      display: inline-flex; align-items: center; gap: 10px; border: 1px solid transparent;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 55%, var(--accent-3) 100%);
+      color: var(--white);
+      box-shadow: var(--shadow);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 36px rgba(59,130,246,0.35); }
+    .btn-secondary { background: rgba(148,163,184,0.15); color: var(--white); border-color: rgba(148,163,184,0.25); }
+    .btn-secondary:hover { background: rgba(148,163,184,0.25); }
+
+    /* Hero graphic */
+    .hero-graphic {
+      position: relative;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(15,23,42,0.6) 0%, rgba(17,24,39,0.8) 100%);
+      border: 1px solid rgba(148,163,184,0.18);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 320px;
+    }
+    .grid-bg {
+      position: absolute; inset: 0;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(148,163,184,0.18) 1px, transparent 1px);
+      background-size: 24px 24px;
+      opacity: 0.5;
+    }
+    .blobs {
+      position: absolute; inset: -20% -8% -10% -10%;
+      filter: blur(24px);
+    }
+    .blobs svg { width: 100%; height: 100%; opacity: 0.65; }
+    .panel {
+      position: absolute; left: 18px; right: 18px; bottom: 18px;
+      background: rgba(2,6,23,0.6);
+      border: 1px solid rgba(148,163,184,0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      color: var(--muted);
+    }
+    .panel .stat { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+    .panel .stat b { color: var(--white); }
+
+    /* Section base */
+    section { padding: 70px 0; }
+    .section-title { font-size: clamp(22px, 4vw, 32px); font-weight: 800; margin: 0 0 10px; }
+    .section-sub { color: var(--muted); max-width: 65ch; }
+
+    /* Services */
+    .cards { margin-top: 28px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    .card {
+      background: linear-gradient(180deg, rgba(15,23,42,0.65) 0%, rgba(17,24,39,0.85) 100%);
+      border: 1px solid rgba(148,163,184,0.18);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 18px 36px rgba(2,6,23,0.4); }
+    .icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: rgba(148,163,184,0.14); display: grid; place-items: center; margin-bottom: 10px;
+      border: 1px solid rgba(148,163,184,0.24);
+    }
+    .icon svg { width: 24px; height: 24px; }
+    .card h3 { font-size: 18px; margin: 0 0 8px 0; }
+    .card p { color: var(--muted); margin: 0; }
+
+    /* Why choose us */
+    .why {
+      display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 28px; align-items: start;
+    }
+    .bullets { display: grid; gap: 12px; margin-top: 14px; }
+    .bullet {
+      display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: start;
+      background: rgba(148,163,184,0.10); border: 1px solid rgba(148,163,184,0.18); border-radius: var(--radius-sm);
+      padding: 12px 14px;
+    }
+    .bullet .dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: linear-gradient(180deg, var(--accent) 0%, var(--accent-2) 100%);
+      margin-top: 6px;
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.12);
+    }
+    .why-graphic {
+      position: relative;
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(15,23,42,0.6) 0%, rgba(17,24,39,0.8) 100%);
+      border: 1px solid rgba(148,163,184,0.18);
+      box-shadow: var(--shadow);
+      min-height: 240px;
+      overflow: hidden;
+    }
+    .pulse {
+      position: absolute; inset: 0; display: grid; place-items: center;
+    }
+    .pulse .ring {
+      width: 70%; height: 70%;
+      border: 2px dashed rgba(34,211,238,0.45);
+      border-radius: 999px;
+      animation: spin 20s linear infinite;
+      filter: drop-shadow(0 10px 24px rgba(34,211,238,0.2));
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* CTA */
+    .cta {
+      background:
+        radial-gradient(800px 400px at 20% -10%, rgba(139,92,246,0.25) 0%, rgba(139,92,246,0.07) 55%, transparent 70%),
+        radial-gradient(900px 500px at 100% 100%, rgba(16,185,129,0.16) 0%, rgba(16,185,129,0.08) 45%, transparent 65%),
+        linear-gradient(160deg, var(--bg-dark) 0%, var(--bg-deep) 65%);
+      border-top: 1px solid rgba(148,163,184,0.15);
+    }
+    .cta-box {
+      margin-top: 22px;
+      display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center;
+      background: rgba(2,6,23,0.55); border: 1px solid rgba(148,163,184,0.2); border-radius: var(--radius);
+      padding: 18px;
+    }
+    .cta-note { color: var(--muted); }
+    .cta .btn-primary { padding: 16px 22px; }
+
+    /* Footer */
+    footer {
+      color: var(--muted);
+      border-top: 1px solid rgba(148,163,184,0.15);
+      padding: 20px 0 40px;
+      background: linear-gradient(180deg, rgba(2,6,23,0.45) 0%, rgba(2,6,23,0.2) 100%);
+    }
+    .foot-inner {
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+      flex-wrap: wrap;
+    }
+    .foot-inner small { color: var(--muted); }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .why { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 640px) {
+      .cards { grid-template-columns: 1fr; }
+      .cta-box { grid-template-columns: 1fr; }
+      .nav { display: table-column; margin-top: 30px; }
+      .panel { flex-direction: column; align-items: flex-start; }
+    }
+
+   
+    .navbar {
+    min-height: 70px;
     display: flex;
-    right: 0;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.75) 0%, rgba(2, 6, 23, 0.35) 100%);
   }
-  .hamburger {
-    display: flex; /* show hamburger */
-  }
-}
 
-/* Hamburger animation */
-.hamburger.active span:nth-child(1) {
-  transform: rotate(45deg) translate(5px, 5px);
-}
-.hamburger.active span:nth-child(2) {
-  opacity: 0;
-}
-.hamburger.active span:nth-child(3) {
-  transform: rotate(-45deg) translate(5px, -5px);
-}
+  /* Hamburger */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 25px;
+    height: 20px;
+    cursor: pointer;
+  }
+  .hamburger span {
+    display: block;
+    height: 3px;
+    background: #fff;
+    border-radius: 2px;
+    transition: 0.3s;
+  }
+
+  /* Nav links */
+  .nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex; /* desktop default */
+    gap: 20px;
+  }
+  .nav-links li a {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  /* Mobile view */
+  @media (max-width: 768px) {
+    .nav-links {
+      display: none; /* hide full nav bar */
+      flex-direction: column;
+      background: #444;
+      position: fixed;
+      top: 0;
+      right: -250px;
+      width: 250px;
+      height: 100%;
+      padding: 20px;
+      transition: right 0.3s ease;
+    }
+    .nav-links.active {
+      display: flex;
+      right: 0;
+    }
+    .hamburger {
+      display: flex; /* show hamburger */
+    }
+  }
+
+  /* Hamburger animation */
+  .hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
+
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- Header -->
+    <header aria-label="Site header">
+  <div class="container header-inner">
+    <div class="brand" aria-label="Brand">
+      <img src="https://raw.githubusercontent.com/parmar42/images/main/assets/Arrilan%20logo%202.png" alt="arrilan logo">
+      <div class="title">Automation & Tech Solutions</div>
+    </div>
+    <nav class="navbar" aria-label="Primary">
+      <ul class="nav-links">
+        <li><a href="#services">Services</a></li>
+        <li><a href="#why">Why us</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </nav>
+  </div>
+</header>
+
+    <!-- Hero -->
+    <section class="hero" id="home" aria-label="Hero">
+      <div class="container hero-inner">
+        <div>
+          <div class="eyebrow">Automation, delivered.</div>
+          <h1 class="headline">Empowering businesses with smart automation</h1>
+          <p class="subhead">
+            We design, integrate, and optimize systems that reduce friction, unlock real-time insights, and scale with your growth.
+            From process automation to data-driven decision-making, we bring clarity to complex workflows.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#contact" aria-label="Contact us">
+              <!-- Mail icon -->
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path d="M4 6h16v12H4z" fill="none" stroke="#fff" stroke-width="2" />
+                <path d="M4 6l8 6 8-6" fill="none" stroke="#fff" stroke-width="2" />
+              </svg>
+              Contact us
+            </a>
+            <a class="btn btn-secondary" href="#services" aria-label="View services">
+              <!-- Arrow icon -->
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path d="M5 12h14M13 5l7 7-7 7" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" />
+              </svg>
+              Explore services
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-graphic" role="img" aria-label="Decorative automation visualization">
+          <div class="grid-bg"></div>
+          <div class="blobs">
+            <svg viewBox="0 0 800 400" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#3b82f6" />
+                  <stop offset="50%" stop-color="#22d3ee" />
+                  <stop offset="100%" stop-color="#8b5cf6" />
+                </linearGradient>
+              </defs>
+              <path d="M0 320 C120 280 180 420 320 360 C460 300 520 380 680 340 C740 324 780 280 800 260 L800 400 L0 400 Z" fill="url(#g1)" />
+              <circle cx="140" cy="140" r="60" fill="#22d3ee" opacity="0.45" />
+              <circle cx="540" cy="90" r="80" fill="#3b82f6" opacity="0.35" />
+              <circle cx="660" cy="220" r="40" fill="#8b5cf6" opacity="0.45" />
+            </svg>
+          </div>
+
+          <div class="panel" aria-label="Stats and highlights">
+            <div class="stat">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M4 17h16M6 13l4-4 3 3 5-6" fill="none" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" />
+              </svg>
+              <span>Automation coverage: <b>90%+</b></span>
+            </div>
+            <div class="stat">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M12 6v6l4 2" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" />
+                <circle cx="12" cy="12" r="9" fill="none" stroke="#8b5cf6" stroke-width="2" />
+              </svg>
+              <span>Deployment time: <b>2–4 weeks</b></span>
+            </div>
+            <div class="stat">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M12 3l7 4v6c0 5-7 8-7 8s-7-3-7-8V7l7-4z" fill="none" stroke="#10b981" stroke-width="2" />
+              </svg>
+              <span>Uptime: <b>99.9%</b></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section id="services" aria-label="Services">
+      <div class="container">
+        <h2 class="section-title">Solutions built for real-world operations</h2>
+        <p class="section-sub">We streamline workflows end-to-end, integrating your tools and surfacing the data that matters.</p>
+
+        <div class="cards">
+          <!-- Process Automation -->
+          <article class="card">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="7" cy="7" r="3" fill="#3b82f6"/>
+                <circle cx="17" cy="12" r="3" fill="#22d3ee"/>
+                <circle cx="9" cy="17" r="3" fill="#8b5cf6"/>
+                <path d="M7 10v4M10 7h4M17 15h-3M12 12l-3 3" stroke="#cbd5e1" stroke-width="1.5" fill="none"/>
+              </svg>
+            </div>
+            <h3>Process automation</h3>
+            <p>Eliminate repetitive tasks with reliable, event-driven workflows. Trigger, monitor, and iterate with transparency.</p>
+          </article>
+
+          <!-- Custom Software Development -->
+          <article class="card">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="5" width="18" height="14" rx="3" fill="#3b82f6"/>
+                <path d="M7 9h10M7 12h10M7 15h6" stroke="#ffffff" stroke-width="1.5" />
+              </svg>
+            </div>
+            <h3>Custom software development</h3>
+            <p>Tailored apps that fit your operations. Clean architecture, robust logging, and maintainable codebases.</p>
+          </article>
+
+          <!-- System Integration -->
+          <article class="card">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M6 6h12v12H6z" fill="#22d3ee" opacity="0.75"/>
+                <path d="M3 12h18M12 3v18" stroke="#cbd5e1" stroke-width="1.5"/>
+                <circle cx="12" cy="12" r="3" fill="#8b5cf6"/>
+              </svg>
+            </div>
+            <h3>System integration</h3>
+            <p>Connect CRMs, ERPs, and IoT. Unified data flows and dependable APIs for real-time visibility.</p>
+          </article>
+
+          <!-- Data Analytics -->
+          <article class="card">
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 19h16" stroke="#cbd5e1" stroke-width="1.5" />
+                <rect x="6" y="12" width="3" height="6" fill="#3b82f6"/>
+                <rect x="11" y="9" width="3" height="9" fill="#22d3ee"/>
+                <rect x="16" y="6" width="3" height="12" fill="#8b5cf6"/>
+              </svg>
+            </div>
+            <h3>Data analytics</h3>
+            <p>Dashboards and insights that reduce guesswork. Trend analysis, anomaly detection, and clear reporting.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Why choose us -->
+    <section id="why" aria-label="Why choose us">
+      <div class="container why">
+        <div>
+          <h2 class="section-title">Why choose us?</h2>
+          <p class="section-sub">We favor clarity over complexity. Every event, variable, and decision is traceable and documented.</p>
+
+          <div class="bullets" role="list">
+            <div class="bullet" role="listitem">
+              <div class="dot" aria-hidden="true"></div>
+              <div><strong>Transparent workflows:</strong> Full logging across the event chain, so you always know what’s happening.</div>
+            </div>
+            <div class="bullet" role="listitem">
+              <div class="dot" aria-hidden="true"></div>
+              <div><strong>Rapid iteration:</strong> Reproducible setups enable faster experiments and dependable releases.</div>
+            </div>
+            <div class="bullet" role="listitem">
+              <div class="dot" aria-hidden="true"></div>
+              <div><strong>Future-ready:</strong> Scalable architecture designed for integrations and real-time data.</div>
+            </div>
+            <div class="bullet" role="listitem">
+              <div class="dot" aria-hidden="true"></div>
+              <div><strong>Human-centric:</strong> Interfaces that make complex systems understandable for every stakeholder.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="why-graphic" role="img" aria-label="System health pulse visualization">
+          <div class="pulse">
+            <div class="ring"></div>
+          </div>
+          <svg viewBox="0 0 600 240" preserveAspectRatio="none" aria-hidden="true" style="position:absolute; inset:0;">
+            <defs>
+              <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#22d3ee"/>
+                <stop offset="50%" stop-color="#3b82f6"/>
+                <stop offset="100%" stop-color="#8b5cf6"/>
+              </linearGradient>
+            </defs>
+            <path d="M0 150 Q 60 140 90 120 Q 120 100 150 110 Q 180 120 220 90 Q 260 60 290 110 Q 320 160 360 140 Q 400 120 440 130 Q 480 140 520 120 Q 560 100 600 110"
+                  fill="none" stroke="url(#line)" stroke-width="3" />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta" id="contact" aria-label="Call to action">
+      <div class="container">
+        <h2 class="section-title">Ready to make operations effortless?</h2>
+        <div class="cta-box">
+          <div class="cta-note">
+            <strong>Let’s talk:</strong> Share your goals and systems. We’ll propose a clear plan with timelines and outcomes.
+          </div>
+          <a class="btn btn-primary" href="mailto:hello@example.com" aria-label="Email us">
+            <!-- Send icon -->
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path d="M4 12l15-7-7 15-2-6-6-2z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+            Email us
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer aria-label="Footer">
+      <div class="container foot-inner">
+        <small>© <span id="y"></span> Arrilan Automation & Tech Solutions. All rights reserved.</small>
+        <small>Privacy • Terms • Security</small>
+      </div>
+    </footer>
+  </div>
+
+<script>
+// Set current year
+document.getElementById('y').textContent = new Date().getFullYear();
+
+// Hamburger menu toggle
+const hamburger = document.querySelector('.hamburger');
+const navLinks = document.querySelector('.nav-links');
+
+hamburger.addEventListener('click', () => {
+hamburger.classList.toggle('active');
+navLinks.classList.toggle('active');
+});
+
+
+  </script>
+  </body>
+</html>
